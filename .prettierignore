@@ -1,0 +1,10 @@
+node_modules
+dist-electron
+dist-renderer
+dist-packages
+coverage
+.husky/_
+playwright-report
+test-results
+pnpm-lock.yaml
+*.tsbuildinfo
