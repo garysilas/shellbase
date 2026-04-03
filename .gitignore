@@ -5,6 +5,7 @@ dist-renderer
 dist-packages
 coverage
 .husky/_
+.idea
 playwright-report
 test-results
 *.tsbuildinfo
