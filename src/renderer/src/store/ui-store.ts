@@ -1,26 +1,34 @@
 import { create } from 'zustand';
 
-type UiStore = {
-  appName: string;
+export type UiStore = {
   isConversationPanelOpen: boolean;
   isSettingsOpen: boolean;
-  setConversationPanelOpen: (isOpen: boolean) => void;
+  openConversationPanel: () => void;
+  closeConversationPanel: () => void;
   toggleConversationPanel: () => void;
-  setSettingsOpen: (isOpen: boolean) => void;
+  openSettings: () => void;
+  closeSettings: () => void;
   toggleSettings: () => void;
 };
 
-export const useUiStore = create<UiStore>((set) => ({
-  appName: 'Shellbase',
+export const createInitialUiState = (): Pick<
+  UiStore,
+  'isConversationPanelOpen' | 'isSettingsOpen'
+> => ({
   isConversationPanelOpen: false,
   isSettingsOpen: false,
-  setConversationPanelOpen: (isConversationPanelOpen) =>
-    set({ isConversationPanelOpen }),
+});
+
+export const useUiStore = create<UiStore>((set) => ({
+  ...createInitialUiState(),
+  openConversationPanel: () => set({ isConversationPanelOpen: true }),
+  closeConversationPanel: () => set({ isConversationPanelOpen: false }),
   toggleConversationPanel: () =>
     set((state) => ({
       isConversationPanelOpen: !state.isConversationPanelOpen,
     })),
-  setSettingsOpen: (isSettingsOpen) => set({ isSettingsOpen }),
+  openSettings: () => set({ isSettingsOpen: true }),
+  closeSettings: () => set({ isSettingsOpen: false }),
   toggleSettings: () =>
     set((state) => ({
       isSettingsOpen: !state.isSettingsOpen,

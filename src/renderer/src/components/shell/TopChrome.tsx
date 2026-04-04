@@ -3,10 +3,11 @@ import type { CSSProperties } from 'react';
 type TopChromeProps = {
   appName: string;
   platform: string;
+  title: string;
 };
 
-const leftChips = ['Workspace', 'Desktop'];
-const centerChips = ['Dark shell', 'Local session'];
+const leadingChips = ['Desktop'];
+const trailingChips = ['Dark shell', 'Local session'];
 
 type AppRegionStyle = CSSProperties & {
   WebkitAppRegion: 'drag' | 'no-drag';
@@ -15,7 +16,7 @@ type AppRegionStyle = CSSProperties & {
 const dragRegionStyle: AppRegionStyle = { WebkitAppRegion: 'drag' };
 const noDragRegionStyle: AppRegionStyle = { WebkitAppRegion: 'no-drag' };
 
-export const TopChrome = ({ appName, platform }: TopChromeProps) => {
+export const TopChrome = ({ appName, platform, title }: TopChromeProps) => {
   const isMac =
     platform === 'darwin' ||
     /mac/i.test(navigator.platform) ||
@@ -34,7 +35,10 @@ export const TopChrome = ({ appName, platform }: TopChromeProps) => {
           {appName}
         </div>
         <div className="flex items-center gap-2" aria-hidden="true" style={noDragStyle}>
-          {leftChips.map((chip) => (
+          <span className="rounded-full bg-zinc-300 px-3 py-1 font-medium tracking-[0.18em] text-[#111111]">
+            {title}
+          </span>
+          {leadingChips.map((chip) => (
             <span
               key={chip}
               className="rounded-full bg-white/[0.05] px-3 py-1 tracking-[0.18em] text-zinc-500"
@@ -50,7 +54,7 @@ export const TopChrome = ({ appName, platform }: TopChromeProps) => {
         aria-hidden="true"
         style={noDragStyle}
       >
-        {centerChips.map((chip) => (
+        {trailingChips.map((chip) => (
           <span
             key={chip}
             className="rounded-full bg-white/[0.05] px-3 py-1 tracking-[0.18em] text-zinc-500"

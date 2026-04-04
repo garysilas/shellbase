@@ -1,118 +1,175 @@
 import { create } from 'zustand';
 
-export type ChatMessageRole = 'user' | 'assistant';
+export type ChatRole = 'user' | 'assistant';
 
 export type ChatMessage = {
   id: string;
-  role: ChatMessageRole;
+  role: ChatRole;
   content: string;
+  createdAt: string;
 };
 
-export type ChatConversation = {
+export type Conversation = {
   id: string;
   title: string;
-  messages: ChatMessage[];
+  createdAt: string;
+  updatedAt: string;
 };
 
-type AppendChatMessageInput = {
-  conversationId: string;
-  role: ChatMessageRole;
-  content: string;
+export type SendState = {
+  status: 'idle' | 'sending' | 'error';
+  errorMessage: string | null;
 };
 
-type ChatStore = {
-  conversations: ChatConversation[];
-  activeConversationId: string | null;
-  isSending: boolean;
-  nextConversationNumber: number;
-  nextMessageNumber: number;
-  createConversation: () => string;
+export type ChatStore = {
+  conversations: Conversation[];
+  selectedConversationId: string;
+  messagesByConversation: Record<string, ChatMessage[]>;
+  sendState: SendState;
+  createConversation: (title?: string) => string;
   selectConversation: (conversationId: string) => void;
-  appendMessage: (input: AppendChatMessageInput) => string | null;
-  setSendingState: (isSending: boolean) => void;
+  appendMessage: (conversationId: string, message: ChatMessage) => void;
+  setConversationTitle: (conversationId: string, title: string) => void;
+  setSendState: (next: SendState) => void;
+  resetSendState: () => void;
 };
 
-const createConversationId = (conversationNumber: number) =>
-  `conversation-${conversationNumber}`;
+const DEFAULT_CONVERSATION_TITLE = 'New chat';
 
-const createMessageId = (messageNumber: number) => `message-${messageNumber}`;
+const createTimestamp = () => new Date().toISOString();
 
-const initialConversation: ChatConversation = {
-  id: createConversationId(1),
-  title: 'New chat',
-  messages: [],
+const createUpdatedTimestamp = (previousUpdatedAt: string) => {
+  const nextTimestamp = createTimestamp();
+
+  if (nextTimestamp > previousUpdatedAt) {
+    return nextTimestamp;
+  }
+
+  return new Date(Date.parse(previousUpdatedAt) + 1).toISOString();
 };
 
-export const useChatStore = create<ChatStore>((set, get) => ({
-  conversations: [initialConversation],
-  activeConversationId: initialConversation.id,
-  isSending: false,
-  nextConversationNumber: 2,
-  nextMessageNumber: 1,
-  createConversation: () => {
-    const conversationId = createConversationId(get().nextConversationNumber);
+const createConversation = (title = DEFAULT_CONVERSATION_TITLE): Conversation => {
+  const timestamp = createTimestamp();
+
+  return {
+    id: crypto.randomUUID(),
+    title,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+};
+
+const createInitialSendState = (): SendState => ({
+  status: 'idle',
+  errorMessage: null,
+});
+
+export const createInitialChatState = (): Pick<
+  ChatStore,
+  'conversations' | 'selectedConversationId' | 'messagesByConversation' | 'sendState'
+> => {
+  const initialConversation = createConversation();
+
+  return {
+    conversations: [initialConversation],
+    selectedConversationId: initialConversation.id,
+    messagesByConversation: {
+      [initialConversation.id]: [],
+    },
+    sendState: createInitialSendState(),
+  };
+};
+
+export const useChatStore = create<ChatStore>((set) => ({
+  ...createInitialChatState(),
+  createConversation: (title = DEFAULT_CONVERSATION_TITLE) => {
+    const conversation = createConversation(title);
 
     set((state) => ({
-      conversations: [
-        ...state.conversations,
-        {
-          id: conversationId,
-          title: 'New chat',
-          messages: [],
-        },
-      ],
-      activeConversationId: conversationId,
-      nextConversationNumber: state.nextConversationNumber + 1,
+      conversations: [...state.conversations, conversation],
+      selectedConversationId: conversation.id,
+      messagesByConversation: {
+        ...state.messagesByConversation,
+        [conversation.id]: [],
+      },
     }));
 
-    return conversationId;
+    return conversation.id;
   },
   selectConversation: (conversationId) =>
     set((state) => {
-      const hasConversation = state.conversations.some(
+      const conversationExists = state.conversations.some(
         (conversation) => conversation.id === conversationId,
       );
 
-      if (!hasConversation) {
+      if (!conversationExists) {
         return state;
       }
 
       return {
-        activeConversationId: conversationId,
+        selectedConversationId: conversationId,
       };
     }),
-  appendMessage: ({ conversationId, role, content }) => {
-    const { conversations, nextMessageNumber } = get();
-    const hasConversation = conversations.some(
-      (conversation) => conversation.id === conversationId,
-    );
+  appendMessage: (conversationId, message) =>
+    set((state) => {
+      const existingMessages = state.messagesByConversation[conversationId];
 
-    if (!hasConversation) {
-      return null;
-    }
+      if (!existingMessages) {
+        return state;
+      }
 
-    const messageId = createMessageId(nextMessageNumber);
+      const targetConversation = state.conversations.find(
+        (conversation) => conversation.id === conversationId,
+      );
 
-    set((state) => ({
-      conversations: state.conversations.map((conversation) =>
-        conversation.id === conversationId
-          ? {
-              ...conversation,
-              messages: [
-                ...conversation.messages,
-                {
-                  id: messageId,
-                  role,
-                  content,
-                },
-              ],
-            }
-          : conversation,
-      ),
-      nextMessageNumber: state.nextMessageNumber + 1,
-    }));
+      if (!targetConversation) {
+        return state;
+      }
 
-    return messageId;
-  },
-  setSendingState: (isSending) => set({ isSending }),
+      const updatedAt = createUpdatedTimestamp(targetConversation.updatedAt);
+
+      return {
+        conversations: state.conversations.map((conversation) =>
+          conversation.id === conversationId
+            ? { ...conversation, updatedAt }
+            : conversation,
+        ),
+        messagesByConversation: {
+          ...state.messagesByConversation,
+          [conversationId]: [...existingMessages, message],
+        },
+      };
+    }),
+  setConversationTitle: (conversationId, title) =>
+    set((state) => {
+      const trimmedTitle = title.trim();
+
+      if (!trimmedTitle) {
+        return state;
+      }
+
+      let didUpdate = false;
+
+      const conversations = state.conversations.map((conversation) => {
+        if (conversation.id !== conversationId) {
+          return conversation;
+        }
+
+        didUpdate = true;
+
+        return {
+          ...conversation,
+          title: trimmedTitle,
+          updatedAt: createUpdatedTimestamp(conversation.updatedAt),
+        };
+      });
+
+      if (!didUpdate) {
+        return state;
+      }
+
+      return { conversations };
+    }),
+  setSendState: (next) => set({ sendState: next }),
+  resetSendState: () => set({ sendState: createInitialSendState() }),
 }));

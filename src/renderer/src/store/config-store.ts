@@ -1,20 +1,31 @@
 import { create } from 'zustand';
 
-export type ChatMode = 'mock' | 'real';
+export type AppMode = 'mock' | 'real';
+export type ConfigStatus = 'configured' | 'not-configured';
 
-type ConfigStore = {
-  mode: ChatMode;
-  isGatewayConfigured: boolean;
-  model: string;
-  setMode: (mode: ChatMode) => void;
-  setGatewayConfigured: (isConfigured: boolean) => void;
+export type ConfigStore = {
+  mode: AppMode;
+  configStatus: ConfigStatus;
+  isRealModeAvailable: boolean;
+  modelLabel: string;
+  setMode: (mode: AppMode) => void;
+  setConfigStatus: (status: ConfigStatus) => void;
+  setRealModeAvailable: (available: boolean) => void;
 };
 
-export const useConfigStore = create<ConfigStore>((set) => ({
+export const createInitialConfigState = (): Pick<
+  ConfigStore,
+  'mode' | 'configStatus' | 'isRealModeAvailable' | 'modelLabel'
+> => ({
   mode: 'mock',
-  isGatewayConfigured: false,
-  model: 'gateway-default',
+  configStatus: 'not-configured',
+  isRealModeAvailable: false,
+  modelLabel: 'Model',
+});
+
+export const useConfigStore = create<ConfigStore>((set) => ({
+  ...createInitialConfigState(),
   setMode: (mode) => set({ mode }),
-  setGatewayConfigured: (isGatewayConfigured) =>
-    set({ isGatewayConfigured }),
+  setConfigStatus: (configStatus) => set({ configStatus }),
+  setRealModeAvailable: (isRealModeAvailable) => set({ isRealModeAvailable }),
 }));

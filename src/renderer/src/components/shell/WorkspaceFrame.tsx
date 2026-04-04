@@ -1,18 +1,12 @@
 import { ComposerDock } from './ComposerDock';
-import { TopBar } from './TopBar';
-
-type WorkspaceFrameProps = {
-  title: string;
-};
 
 const emptyStateWidths = ['w-[190px]', 'w-[150px]', 'w-[170px]', 'w-[210px]'];
 
-export const WorkspaceFrame = ({ title }: WorkspaceFrameProps) => {
+export const WorkspaceFrame = () => {
   return (
-    <section className="flex min-h-0 flex-1 flex-col bg-[#262626] px-0">
-      <div className="flex min-h-0 flex-1 flex-col rounded-[10px] border border-white/[0.05] bg-[#0d0d0d]">
-        <TopBar title={title} />
-        <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden">
+    <section className="flex min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col rounded-[10px] border-[5px] border-[#262626] bg-[#0d0d0d]">
+        <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-[5px]">
           <div className="flex flex-col items-center gap-4" aria-hidden="true">
             {emptyStateWidths.map((widthClass, index) => (
               <span
