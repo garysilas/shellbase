@@ -130,7 +130,7 @@ Shellbase is intended to be a polished desktop-first, chat-first IDE scaffold wi
 
 ### Priority Task List (ordered)
 
-1. **Implement `ui`, `chat`, `config` stores**
+1. **Implement `ui`, `chat`, `config` stores** — **Done**
    - **What to build:** Split state into deterministic domains (panel/settings state, conversations/messages/send state, mode/config status).
    - **Why it matters:** Unblocks all interactive behavior with clear boundaries.
    - **Files to modify:** `src/renderer/src/store/*` (new store modules), `src/renderer/src/App.tsx`.
