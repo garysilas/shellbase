@@ -18,7 +18,7 @@ export const AppShell = ({ appName, platform, versions }: AppShellProps) => {
   return (
     <main className="h-screen overflow-hidden bg-[#262626] text-zinc-100">
       <div className="flex h-full flex-col bg-[linear-gradient(180deg,#2a2a2a_0%,#242424_100%)]">
-        <TopChrome appName={appName} />
+        <TopChrome appName={appName} platform={platform} />
         <div className="flex min-h-0 flex-1 overflow-hidden">
           <LeftRail appName={appName} />
           <ConversationPanel isOpen={isConversationPanelOpen} />
