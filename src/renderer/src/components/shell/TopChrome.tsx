@@ -2,27 +2,38 @@ import type { CSSProperties } from 'react';
 
 type TopChromeProps = {
   appName: string;
+  platform: string;
 };
 
 const leftChips = ['Workspace', 'Desktop'];
 const centerChips = ['Dark shell', 'Local session'];
 
-export const TopChrome = ({ appName }: TopChromeProps) => {
+type AppRegionStyle = CSSProperties & {
+  WebkitAppRegion: 'drag' | 'no-drag';
+};
+
+const dragRegionStyle: AppRegionStyle = { WebkitAppRegion: 'drag' };
+const noDragRegionStyle: AppRegionStyle = { WebkitAppRegion: 'no-drag' };
+
+export const TopChrome = ({ appName, platform }: TopChromeProps) => {
+  const isMac =
+    platform === 'darwin' ||
+    /mac/i.test(navigator.platform) ||
+    /mac os|macintosh|macintel/i.test(navigator.userAgent);
+  const dragStyle = isMac ? dragRegionStyle : undefined;
+  const noDragStyle = isMac ? noDragRegionStyle : undefined;
+  const leftClusterOffsetClass = isMac ? 'pl-24' : '';
+
   return (
     <div
-      className="flex h-8 items-center justify-between border-b border-white/[0.04] bg-[#262626] px-3 text-[11px] text-zinc-400"
-      style={{ WebkitAppRegion: 'drag' } as CSSProperties}
+      className="flex h-8 items-center justify-between bg-[#262626] px-12 text-[11px] text-zinc-400"
+      style={dragStyle}
     >
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5" aria-hidden="true">
-          <span className="h-2.5 w-2.5 rounded-full bg-zinc-500" />
-          <span className="h-2.5 w-2.5 rounded-full bg-zinc-500" />
-          <span className="h-2.5 w-2.5 rounded-full bg-zinc-500" />
-        </div>
-        <div className="rounded-full bg-white/[0.08] px-3 py-1 font-medium tracking-[0.22em] text-zinc-200">
+      <div className={`flex items-center gap-3 ${leftClusterOffsetClass}`}>
+        <div className="rounded-full bg-white/[0.08] px-3 py-1 font-medium tracking-[0.22em] text-zinc-200" style={noDragStyle}>
           {appName}
         </div>
-        <div className="flex items-center gap-2" aria-hidden="true">
+        <div className="flex items-center gap-2" aria-hidden="true" style={noDragStyle}>
           {leftChips.map((chip) => (
             <span
               key={chip}
@@ -34,7 +45,11 @@ export const TopChrome = ({ appName }: TopChromeProps) => {
         </div>
       </div>
 
-      <div className="hidden items-center gap-2 md:flex" aria-hidden="true">
+      <div
+        className="hidden items-center gap-2 md:flex"
+        aria-hidden="true"
+        style={noDragStyle}
+      >
         {centerChips.map((chip) => (
           <span
             key={chip}
@@ -43,12 +58,6 @@ export const TopChrome = ({ appName }: TopChromeProps) => {
             {chip}
           </span>
         ))}
-      </div>
-
-      <div className="flex items-center gap-2" aria-hidden="true">
-        <span className="h-3 w-3 rounded-sm bg-[#6E787E2E]" />
-        <span className="h-3 w-3 rounded-sm bg-[#6E787E29]" />
-        <span className="h-3 w-3 rounded-sm bg-[#6E787E24]" />
       </div>
     </div>
   );

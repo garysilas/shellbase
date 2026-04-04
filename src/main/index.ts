@@ -9,6 +9,8 @@ const createMainWindow = (): BrowserWindow => {
     minHeight: 720,
     backgroundColor: '#090b10',
     title: 'Shellbase',
+    titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
+    trafficLightPosition: process.platform === 'darwin' ? { x: 16, y: 10 } : undefined,
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
       contextIsolation: true,
