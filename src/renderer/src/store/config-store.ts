@@ -27,5 +27,9 @@ export const useConfigStore = create<ConfigStore>((set) => ({
   ...createInitialConfigState(),
   setMode: (mode) => set({ mode }),
   setConfigStatus: (configStatus) => set({ configStatus }),
-  setRealModeAvailable: (isRealModeAvailable) => set({ isRealModeAvailable }),
+  setRealModeAvailable: (isRealModeAvailable) =>
+    set({
+      isRealModeAvailable,
+      configStatus: isRealModeAvailable ? 'configured' : 'not-configured',
+    }),
 }));

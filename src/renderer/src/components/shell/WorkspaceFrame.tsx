@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { MessageThread } from '../chat/MessageThread';
+import { chatServiceFactory } from '../../services/chat/chatServiceFactory';
 import { useChatStore } from '../../store/chat-store';
+import { useConfigStore } from '../../store/config-store';
 import { ComposerDock } from './ComposerDock';
 
-const createUserMessage = (content: string) => ({
+const createChatMessage = (role: 'user' | 'assistant', content: string) => ({
   id: crypto.randomUUID(),
-  role: 'user' as const,
+  role,
   content,
   createdAt: new Date().toISOString(),
 });
@@ -16,17 +18,48 @@ export const WorkspaceFrame = () => {
     (state) => state.messagesByConversation[state.selectedConversationId] ?? [],
   );
   const appendMessage = useChatStore((state) => state.appendMessage);
+  const sendState = useChatStore((state) => state.sendState);
+  const setSendState = useChatStore((state) => state.setSendState);
+  const resetSendState = useChatStore((state) => state.resetSendState);
+  const mode = useConfigStore((state) => state.mode);
   const [draftMessage, setDraftMessage] = useState('');
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     const trimmedMessage = draftMessage.trim();
 
-    if (!trimmedMessage) {
+    if (!trimmedMessage || sendState.status === 'sending') {
       return;
     }
 
-    appendMessage(selectedConversationId, createUserMessage(trimmedMessage));
+    const conversationId = selectedConversationId;
+
+    appendMessage(conversationId, createChatMessage('user', trimmedMessage));
     setDraftMessage('');
+
+    setSendState({
+      status: 'sending',
+      errorMessage: null,
+    });
+
+    try {
+      const chatService = chatServiceFactory(mode);
+      const assistantResponse = await chatService.sendMessage({
+        conversationId,
+        message: trimmedMessage,
+      });
+
+      appendMessage(
+        conversationId,
+        createChatMessage('assistant', assistantResponse.content),
+      );
+      resetSendState();
+    } catch (error) {
+      setSendState({
+        status: 'error',
+        errorMessage:
+          error instanceof Error ? error.message : 'Unable to send message',
+      });
+    }
   };
 
   return (
@@ -40,6 +73,7 @@ export const WorkspaceFrame = () => {
             draftMessage={draftMessage}
             onDraftMessageChange={setDraftMessage}
             onSendMessage={handleSendMessage}
+            isSending={sendState.status === 'sending'}
           />
         </div>
       </div>

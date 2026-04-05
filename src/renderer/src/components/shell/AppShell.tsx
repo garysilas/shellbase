@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import type { ShellbaseVersions } from '../../../../shared/shellbase-api';
+import { getGatewayRuntimeConfig } from '../../config/gateway-runtime-config';
 import { useChatStore } from '../../store/chat-store';
+import { useConfigStore } from '../../store/config-store';
 import { useUiStore } from '../../store/ui-store';
 import { ConversationPanel } from './ConversationPanel';
 import { LeftRail } from './LeftRail';
@@ -23,6 +26,9 @@ export const AppShell = ({ appName, platform, versions }: AppShellProps) => {
     (state) => state.toggleConversationPanel,
   );
   const toggleSettings = useUiStore((state) => state.toggleSettings);
+  const setRealModeAvailable = useConfigStore(
+    (state) => state.setRealModeAvailable,
+  );
   const createConversation = useChatStore((state) => state.createConversation);
   const selectedConversationId = useChatStore(
     (state) => state.selectedConversationId,
@@ -38,6 +44,12 @@ export const AppShell = ({ appName, platform, versions }: AppShellProps) => {
   const handleCreateConversation = () => {
     createConversation();
   };
+
+  useEffect(() => {
+    const gatewayRuntimeConfig = getGatewayRuntimeConfig();
+
+    setRealModeAvailable(gatewayRuntimeConfig.isConfigured);
+  }, [setRealModeAvailable]);
 
   return (
     <main className="h-screen overflow-hidden bg-[#262626] text-zinc-100">
