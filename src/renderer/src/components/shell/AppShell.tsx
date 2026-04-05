@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import type { ShellbaseVersions } from '../../../../shared/shellbase-api';
 import { getGatewayRuntimeConfig } from '../../config/gateway-runtime-config';
 import { useChatStore } from '../../store/chat-store';
 import { useConfigStore } from '../../store/config-store';
@@ -7,14 +6,14 @@ import { useUiStore } from '../../store/ui-store';
 import { ConversationPanel } from './ConversationPanel';
 import { LeftRail } from './LeftRail';
 import { RightRail } from './RightRail';
-import { StatusBar } from './StatusBar';
+import { StatusBar, type StatusBarVersions } from './StatusBar';
 import { TopChrome } from './TopChrome';
 import { WorkspaceFrame } from './WorkspaceFrame';
 
 type AppShellProps = {
   appName: string;
   platform: string;
-  versions: ShellbaseVersions;
+  versions: StatusBarVersions;
 };
 
 export const AppShell = ({ appName, platform, versions }: AppShellProps) => {

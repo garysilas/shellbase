@@ -2,6 +2,8 @@ import { app, BrowserWindow } from 'electron';
 import { join } from 'node:path';
 
 const createMainWindow = (): BrowserWindow => {
+  const isMac = process.platform === 'darwin';
+
   const mainWindow = new BrowserWindow({
     width: 1440,
     height: 920,
@@ -9,8 +11,15 @@ const createMainWindow = (): BrowserWindow => {
     minHeight: 720,
     backgroundColor: '#090b10',
     title: 'Shellbase',
-    titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
-    trafficLightPosition: process.platform === 'darwin' ? { x: 16, y: 10 } : undefined,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: isMac
+      ? undefined
+      : {
+          color: '#262626',
+          symbolColor: '#d4d4d8',
+          height: 32,
+        },
+    trafficLightPosition: isMac ? { x: 16, y: 10 } : undefined,
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
       contextIsolation: true,

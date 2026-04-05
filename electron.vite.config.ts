@@ -17,6 +17,12 @@ export default defineConfig({
   },
   renderer: {
     root: resolve(__dirname, 'src/renderer'),
+    resolve: {
+      alias: {
+        '@renderer': resolve(__dirname, 'src/renderer/src'),
+        '@shared': resolve(__dirname, 'src/shared'),
+      },
+    },
     build: {
       outDir: resolve(__dirname, 'dist-renderer'),
       emptyOutDir: true,

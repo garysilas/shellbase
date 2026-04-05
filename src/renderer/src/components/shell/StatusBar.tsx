@@ -1,8 +1,12 @@
-import type { ShellbaseVersions } from '../../../../shared/shellbase-api';
+export type StatusBarVersions = Readonly<{
+  electron: string;
+  chrome: string;
+  node: string;
+}>;
 
 type StatusBarProps = {
   platform: string;
-  versions: ShellbaseVersions;
+  versions: StatusBarVersions;
 };
 
 const StatusPill = ({ label }: { label: string }) => {
