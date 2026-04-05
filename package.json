@@ -12,7 +12,7 @@
   "scripts": {
     "dev": "electron-vite dev",
     "build": "corepack pnpm typecheck && electron-vite build",
-    "typecheck": "tsc -b",
+    "typecheck": "tsc -p tsconfig.node.json --ignoreDeprecations 6.0 && tsc -p tsconfig.web.json --ignoreDeprecations 6.0",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
