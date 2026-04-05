@@ -16,15 +16,17 @@ const ComposerAction = ({ label }: { label: string }) => {
 type ComposerDockProps = {
   draftMessage: string;
   onDraftMessageChange: (value: string) => void;
-  onSendMessage: () => void;
+  onSendMessage: () => void | Promise<void>;
+  isSending: boolean;
 };
 
 export const ComposerDock = ({
   draftMessage,
   onDraftMessageChange,
   onSendMessage,
+  isSending,
 }: ComposerDockProps) => {
-  const isSendDisabled = draftMessage.trim().length === 0;
+  const isSendDisabled = isSending || draftMessage.trim().length === 0;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,7 +35,7 @@ export const ComposerDock = ({
       return;
     }
 
-    onSendMessage();
+    void onSendMessage();
   };
 
   return (
@@ -52,6 +54,7 @@ export const ComposerDock = ({
               aria-label="Message composer"
               placeholder="Type a message"
               rows={2}
+              disabled={isSending}
               className="min-h-[54px] flex-1 resize-none bg-transparent text-[13px] leading-6 text-zinc-200 outline-none placeholder:text-zinc-500"
             />
           </div>

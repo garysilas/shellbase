@@ -1,5 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import { vi } from 'vitest';
 import { useChatStore } from './store/chat-store';
+import { createInitialConfigState, useConfigStore } from './store/config-store';
 import { useUiStore } from './store/ui-store';
 import { App } from './App';
 
@@ -33,10 +35,24 @@ const resetChatStore = () => {
   });
 };
 
+const resetConfigStore = () => {
+  useConfigStore.setState({
+    ...createInitialConfigState(),
+    setMode: useConfigStore.getState().setMode,
+    setConfigStatus: useConfigStore.getState().setConfigStatus,
+    setRealModeAvailable: useConfigStore.getState().setRealModeAvailable,
+  });
+};
+
 describe('App', () => {
   beforeEach(() => {
     resetUiStore();
     resetChatStore();
+    resetConfigStore();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it('renders the shell foundation layout', () => {
@@ -127,5 +143,74 @@ describe('App', () => {
     expect(useChatStore.getState().conversations).toHaveLength(
       initialConversationCount + 1,
     );
+  });
+
+  it('sends a mock-mode message and appends a deterministic assistant reply', async () => {
+    Object.defineProperty(window, 'shellbase', {
+      configurable: true,
+      value: {
+        getPlatform: () => 'darwin',
+        getVersions: () => ({
+          electron: '1.0.0',
+          chrome: '1.0.0',
+          node: '1.0.0',
+        }),
+      },
+    });
+
+    render(<App />);
+
+    const composer = screen.getByLabelText('Message composer');
+    const sendButton = screen.getByRole('button', { name: 'Send message' });
+
+    fireEvent.change(composer, {
+      target: { value: 'Hello Shellbase' },
+    });
+    fireEvent.click(sendButton);
+
+    expect(await screen.findByText('Hello Shellbase')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Mock response: Hello Shellbase'),
+    ).toBeInTheDocument();
+  });
+
+  it('opens settings, shows config status, and switches mode', async () => {
+    Object.defineProperty(window, 'shellbase', {
+      configurable: true,
+      value: {
+        getPlatform: () => 'darwin',
+        getVersions: () => ({
+          electron: '1.0.0',
+          chrome: '1.0.0',
+          node: '1.0.0',
+        }),
+      },
+    });
+
+    vi.stubEnv('VITE_AI_GATEWAY_API_KEY', 'test-gateway-key');
+
+    render(<App />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+
+    const settingsDialog = screen.getByRole('dialog', { name: 'Settings' });
+
+    expect(await within(settingsDialog).findByText('Configured')).toBeInTheDocument();
+    expect(
+      within(settingsDialog).getByText('Real mode available'),
+    ).toBeInTheDocument();
+
+    const realModeButton = within(settingsDialog).getByRole('button', {
+      name: 'Real mode',
+    });
+    const mockModeButton = within(settingsDialog).getByRole('button', {
+      name: 'Mock mode',
+    });
+
+    fireEvent.click(realModeButton);
+    expect(useConfigStore.getState().mode).toBe('real');
+
+    fireEvent.click(mockModeButton);
+    expect(useConfigStore.getState().mode).toBe('mock');
   });
 });
