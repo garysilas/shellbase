@@ -162,13 +162,13 @@ Shellbase is intended to be a desktop-first, chat-first IDE scaffold with:
    - Files to modify: [`src/renderer/src/components/shell/LeftRail.tsx`](/Users/gary/WebstormProjects/shellbase/src/renderer/src/components/shell/LeftRail.tsx), [`src/renderer/src/components/shell/AppShell.tsx`](/Users/gary/WebstormProjects/shellbase/src/renderer/src/components/shell/AppShell.tsx), [`src/renderer/src/components/shell/ConversationPanel.tsx`](/Users/gary/WebstormProjects/shellbase/src/renderer/src/components/shell/ConversationPanel.tsx)
    - Success criteria: new chat creates a conversation, the panel toggles, and settings can open
 
-3. Build the real conversation panel
+3. Build the real conversation panel [Done]
    - What to build: replace placeholder chat names with store-backed conversations and active selection
    - Why it matters: multi-conversation support is part of the stated MVP
    - Files to modify: [`src/renderer/src/components/shell/ConversationPanel.tsx`](/Users/gary/WebstormProjects/shellbase/src/renderer/src/components/shell/ConversationPanel.tsx), chat store files
    - Success criteria: user can create, view, and switch in-memory conversations
 
-4. Implement the thread and composer flow
+4. Implement the thread and composer flow [Done]
    - What to build: text input, send button behavior, plain text message list, empty-state transition
    - Why it matters: this is the first point where the product becomes useful
    - Files to modify: [`src/renderer/src/components/shell/WorkspaceFrame.tsx`](/Users/gary/WebstormProjects/shellbase/src/renderer/src/components/shell/WorkspaceFrame.tsx), [`src/renderer/src/components/shell/ComposerDock.tsx`](/Users/gary/WebstormProjects/shellbase/src/renderer/src/components/shell/ComposerDock.tsx), add `src/renderer/src/components/chat/*`
