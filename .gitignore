@@ -10,3 +10,7 @@ playwright-report
 test-results
 *.tsbuildinfo
 .DS_Store
+dist-packages-test/
+.env.local
+.env.test
+.env

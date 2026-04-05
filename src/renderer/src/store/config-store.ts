@@ -26,10 +26,16 @@ export const createInitialConfigState = (): Pick<
 export const useConfigStore = create<ConfigStore>((set) => ({
   ...createInitialConfigState(),
   setMode: (mode) => set({ mode }),
-  setConfigStatus: (configStatus) => set({ configStatus }),
+  setConfigStatus: (configStatus) =>
+    set((state) => ({
+      configStatus,
+      isRealModeAvailable: configStatus === 'configured',
+      mode: configStatus === 'configured' ? state.mode : 'mock',
+    })),
   setRealModeAvailable: (isRealModeAvailable) =>
-    set({
+    set((state) => ({
       isRealModeAvailable,
       configStatus: isRealModeAvailable ? 'configured' : 'not-configured',
-    }),
+      mode: isRealModeAvailable ? state.mode : 'mock',
+    })),
 }));

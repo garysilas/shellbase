@@ -25,6 +25,8 @@ export const SettingsModal = ({
     return null;
   }
 
+  const isRealModeDisabled = !isRealModeAvailable;
+
   return (
     <div
       className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-6"
@@ -67,16 +69,37 @@ export const SettingsModal = ({
             <button
               type="button"
               aria-pressed={mode === 'real'}
-              onClick={() => onModeChange('real')}
+              disabled={isRealModeDisabled}
+              onClick={() => {
+                if (isRealModeDisabled) {
+                  return;
+                }
+
+                onModeChange('real');
+              }}
               className={`rounded-[9px] border px-3 py-2 text-[12px] transition ${
                 mode === 'real'
                   ? 'border-zinc-300 bg-zinc-200/10 text-zinc-100'
                   : 'border-white/10 bg-white/[0.02] text-zinc-400 hover:bg-white/[0.06]'
+              } ${
+                isRealModeDisabled
+                  ? 'cursor-not-allowed border-white/10 bg-white/[0.02] text-zinc-500 opacity-60 hover:bg-white/[0.02]'
+                  : ''
               }`}
             >
               Real mode
             </button>
           </div>
+          <p
+            role={isRealModeAvailable ? undefined : 'alert'}
+            className={`text-[12px] ${
+              isRealModeAvailable ? 'text-zinc-400' : 'text-amber-300'
+            }`}
+          >
+            {isRealModeAvailable
+              ? 'Real mode available with current environment config.'
+              : 'Real mode unavailable. Set VITE_AI_GATEWAY_API_KEY to enable it.'}
+          </p>
         </section>
 
         <section className="flex flex-col gap-2 rounded-[10px] border border-white/10 bg-white/[0.02] p-3">

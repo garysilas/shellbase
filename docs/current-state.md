@@ -160,13 +160,13 @@ The repo is past pure scaffolding. It already has a functioning shell, in-memory
    - Files to modify: `src/renderer/src/components/shell/WorkspaceFrame.tsx`, `src/renderer/src/components/chat/EmptyThreadState.tsx`
    - Success criteria: first launch and newly created empty chats show a deliberate empty state
 
-4. Tighten settings and real-mode UX
+4. Tighten settings and real-mode UX [Done]
    - What to build: prevent or clearly guard switching into unusable real mode, and make config status/error behavior more explicit
    - Why it matters: current behavior allows a mode switch that only fails later on send
    - Files to modify: `src/renderer/src/components/settings/SettingsModal.tsx`, `src/renderer/src/store/config-store.ts`, `src/renderer/src/App.test.tsx`
    - Success criteria: real mode cannot be entered silently when unconfigured, or the UI clearly communicates the failure before send
 
-5. Add the first e2e smoke test
+5. Add the first e2e smoke test [Done]
    - What to build: one Playwright happy-path test for launching the app shell and sending a mock message
    - Why it matters: the repo already claims Playwright support, but the command currently fails
    - Files to modify: `playwright.config.ts`, add `e2e/*`

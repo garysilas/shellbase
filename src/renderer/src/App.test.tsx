@@ -213,4 +213,41 @@ describe('App', () => {
     fireEvent.click(mockModeButton);
     expect(useConfigStore.getState().mode).toBe('mock');
   });
+
+  it('keeps real mode guarded when gateway config is unavailable', async () => {
+    Object.defineProperty(window, 'shellbase', {
+      configurable: true,
+      value: {
+        getPlatform: () => 'darwin',
+        getVersions: () => ({
+          electron: '1.0.0',
+          chrome: '1.0.0',
+          node: '1.0.0',
+        }),
+      },
+    });
+
+    vi.stubEnv('VITE_AI_GATEWAY_API_KEY', '');
+
+    render(<App />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+
+    const settingsDialog = screen.getByRole('dialog', { name: 'Settings' });
+    const realModeButton = within(settingsDialog).getByRole('button', {
+      name: 'Real mode',
+    });
+
+    expect(await within(settingsDialog).findByText('Not configured')).toBeInTheDocument();
+    expect(realModeButton).toBeDisabled();
+    expect(
+      within(settingsDialog).getByText(
+        'Real mode unavailable. Set VITE_AI_GATEWAY_API_KEY to enable it.',
+      ),
+    ).toBeInTheDocument();
+
+    fireEvent.click(realModeButton);
+
+    expect(useConfigStore.getState().mode).toBe('mock');
+  });
 });
