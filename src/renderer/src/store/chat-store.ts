@@ -9,6 +9,8 @@ export type ChatMessage = {
   createdAt: string;
 };
 
+export type ConversationContextMessage = Pick<ChatMessage, 'role' | 'content'>;
+
 export type Conversation = {
   id: string;
   title: string;
@@ -63,6 +65,15 @@ const createInitialSendState = (): SendState => ({
   status: 'idle',
   errorMessage: null,
 });
+
+export const toConversationContext = (
+  messages: ChatMessage[],
+): ConversationContextMessage[] => {
+  return messages.map((message) => ({
+    role: message.role,
+    content: message.content,
+  }));
+};
 
 export const createInitialChatState = (): Pick<
   ChatStore,

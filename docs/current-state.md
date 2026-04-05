@@ -148,13 +148,13 @@ The repo is past pure scaffolding. It already has a functioning shell, in-memory
    - Files to modify: `package.json`, `pnpm-lock.yaml`, `electron.vite.config.ts`
    - Success criteria: `dist-packages` is created successfully and the packaged app launches
 
-2. Make real mode multi-turn instead of single-turn
+2. Make real mode multi-turn instead of single-turn [Done]
    - What to build: change the chat service contract to accept conversation history and have `GatewayChatService` send context instead of only the latest prompt
    - Why it matters: without this, “conversation” is only a renderer concept
    - Files to modify: `src/renderer/src/services/chat/ChatService.ts`, `src/renderer/src/services/chat/GatewayChatService.ts`, `src/renderer/src/components/shell/WorkspaceFrame.tsx`, `src/renderer/src/store/chat-store.ts`
    - Success criteria: a second user message can reference earlier context and the service request includes prior messages
 
-3. Restore the intended empty-state experience
+3. Restore the intended empty-state experience [Done]
    - What to build: render `EmptyThreadState` whenever the selected conversation has no messages
    - Why it matters: this is visible on first launch and currently looks unfinished
    - Files to modify: `src/renderer/src/components/shell/WorkspaceFrame.tsx`, `src/renderer/src/components/chat/EmptyThreadState.tsx`

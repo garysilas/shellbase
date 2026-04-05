@@ -19,10 +19,22 @@ export class GatewayChatService implements ChatService {
   }
 
   async sendMessage(request: ChatServiceRequest): Promise<ChatServiceResponse> {
-    const result = await generateText({
-      model: this.openai(this.config.model),
-      prompt: request.message,
-    });
+    const model = this.openai(this.config.model);
+    const requestMessages = request.messages?.map((message) => ({
+      role: message.role,
+      content: message.content,
+    }));
+
+    const result =
+      requestMessages && requestMessages.length > 0
+        ? await generateText({
+            model,
+            messages: requestMessages,
+          })
+        : await generateText({
+            model,
+            prompt: request.message,
+          });
 
     const content = result.text.trim();
 

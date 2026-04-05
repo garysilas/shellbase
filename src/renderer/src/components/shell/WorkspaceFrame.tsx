@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { EmptyThreadState } from '../chat/EmptyThreadState';
 import { MessageThread } from '../chat/MessageThread';
 import { chatServiceFactory } from '../../services/chat/chatServiceFactory';
-import { useChatStore } from '../../store/chat-store';
+import { toConversationContext, useChatStore } from '../../store/chat-store';
 import { useConfigStore } from '../../store/config-store';
 import { ComposerDock } from './ComposerDock';
 
@@ -23,6 +24,7 @@ export const WorkspaceFrame = () => {
   const resetSendState = useChatStore((state) => state.resetSendState);
   const mode = useConfigStore((state) => state.mode);
   const [draftMessage, setDraftMessage] = useState('');
+  const isEmptyThread = messages.length === 0;
 
   const handleSendMessage = async () => {
     const trimmedMessage = draftMessage.trim();
@@ -32,8 +34,16 @@ export const WorkspaceFrame = () => {
     }
 
     const conversationId = selectedConversationId;
+    const userMessage = createChatMessage('user', trimmedMessage);
+    const conversationContext = [
+      ...toConversationContext(messages),
+      {
+        role: userMessage.role,
+        content: userMessage.content,
+      },
+    ];
 
-    appendMessage(conversationId, createChatMessage('user', trimmedMessage));
+    appendMessage(conversationId, userMessage);
     setDraftMessage('');
 
     setSendState({
@@ -46,6 +56,7 @@ export const WorkspaceFrame = () => {
       const assistantResponse = await chatService.sendMessage({
         conversationId,
         message: trimmedMessage,
+        messages: conversationContext,
       });
 
       appendMessage(
@@ -66,8 +77,8 @@ export const WorkspaceFrame = () => {
     <section className="flex min-h-0 flex-1 flex-col">
       <div className="flex min-h-0 flex-1 flex-col rounded-[10px] border-[5px] border-[#262626] bg-[#0d0d0d]">
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[5px]">
-          <div className="min-h-0 flex-1 overflow-y-auto">
-            {messages.length > 0 ? <MessageThread messages={messages} /> : null}
+          <div className={`min-h-0 flex-1 overflow-y-auto ${isEmptyThread ? 'flex' : ''}`}>
+            {isEmptyThread ? <EmptyThreadState /> : <MessageThread messages={messages} />}
           </div>
           <ComposerDock
             draftMessage={draftMessage}
